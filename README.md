@@ -1,4 +1,8 @@
-# :ramen: :curry: :sushi: Case Study #1: Danny's Diner
+# :ramen: :curry: :sushi: Case Study : Danny's Diner
+
+## Introduction  
+Danny's passion for Japanese cuisine led him to open a cozy restaurant in early 2021 selling his 3 favorite dishes: sushi, curry, and ramen.  
+Danny’s Diner has gathered some initial data from the first few months and now needs your expertise to help navigate the business to success.  
 
 ## Objective:
 To leverage SQL analysis to understand customer behavior and improve Danny's Diner's customer loyalty program.
@@ -6,10 +10,11 @@ To leverage SQL analysis to understand customer behavior and improve Danny's Din
 ## Problem Statement:
 Danny’s Diner needs insights into customer spending habits, favorite menu items, and the effectiveness of the loyalty program. By analyzing the provided data, we aim to uncover patterns and actionable insights to enhance customer experience and boost business performance.
 
-## Tools Used:
-- Postgresql
-- pgadmin
-- Visual Studio Code
+## Tools I Used:
+1. **SQL**: The backbone of my analysis, allowing me to query the database and unearth critical insights.
+2. **PostgreSQL**: The chosen database management system, ideal for handling large data.
+3. **Visual Studio Code**: For database management and executing SQL queries.
+4. **GitHub**: For sharing my SQL scripts and analysis, ensuring collaboration and project tracking.
 
 ## Case Study Questions
 
@@ -69,6 +74,55 @@ GROUP BY
 | B           | 6         |
 | C           | 2         |
 
+#### Most visited day of the week by all customers
+```sql
+SELECT
+    TO_CHAR(order_date, 'DAY') AS day_name,
+    count(TO_CHAR(order_date, 'DAY')) AS day_count
+FROM
+    sales
+GROUP BY
+    day_name
+ORDER BY
+    day_count DESC;
+```
+#### Result:  
+Mondays and Fridays are popular among customers to visit the restaurent.  
+
+#### Most visited day of the week by each customer
+```sql
+WITH ranked_visits AS (
+    SELECT
+        customer_id,
+        EXTRACT(DOW FROM order_date) AS day_of_week,
+        TO_CHAR(order_date, 'DAY') AS day_name,
+        count(TO_CHAR(order_date, 'DAY')) AS day_count,
+        ROW_NUMBER() OVER(PARTITION BY customer_id 
+            ORDER BY customer_id, count(TO_CHAR(order_date, 'DAY')) DESC)
+            AS row_num
+    FROM
+        sales
+    GROUP BY
+        customer_id, day_of_week, day_name
+    ORDER BY
+        customer_id,
+        day_count DESC
+)
+SELECT
+    customer_id,
+    day_name,
+  --  day_count
+FROM
+    ranked_visits
+WHERE
+    row_num = 1;
+```
+#### Result set:
+| Customer ID | Day Name |
+|------------|---------|
+| A          | MONDAY  |
+| B          | MONDAY  |
+| C          | FRIDAY  |
 ***
 
 ###  3. What was the first item from the menu purchased by each customer?
@@ -486,19 +540,30 @@ ORDER BY customer_id, order_date, price DESC
 
 ## Insights:
 
-Customer Visits: Customer B visited the restaurant the most.   
-Popular Dish: Ramen is the favorite among customers.   
-Pre-Membership Favorite: Sushi was the common choice before membership.   
-Points Leader: Customer B had the most points before membership; Customer A led in January post-membership.   
-Total Expenditure: Customers collectively spent $186.   
+- **Total Expenditure:** Customers collectively spent $186.
+- **Customer Visits:** Customer B visited the restaurant the most.
+- **Popular Days:** Mondays and Fridays are the busiest days.
+- **Popular Dish:** Ramen is the top favorite.
+- **Pre-Membership Favorite:** Sushi was the preferred choice before the membership program.
+- **Points Leader:**
+  - Customer A leads with the most points.
+  - Customer B would have had the most points had he taken membership earlier.
+- **Membership Program Impact:** If the membership program had started from day one, they'd have accumulated over 400 more points than they currently have.
 
+## Recommendations for Danny's Diner
 
-## Recommendations:
+- **Enhance Membership Program:** Promote the program with special offers and exclusive events to build loyalty.
+- **Target Busy Days:** Capitalize on Mondays and Fridays with promotions and ensure optimal staff and inventory levels.
+- **Boost Ramen Sales:** Highlight Ramen in marketing and introduce variations or limited-edition flavors.
+- **Revisit Sushi Offerings:** Offer special sushi deals and prominently feature sushi in promotions.
+- **Leverage Customer B’s Loyalty:** Offer personalized incentives and use spending patterns for upselling opportunities.
+- **Optimize Marketing Efforts:** Highlight membership benefits and use social media and email marketing to promote events and menu highlights.
+- **Analyze Spending Patterns:**
+  - Continuously monitor customer spending to make data-driven menu and pricing decisions.
+  - Use insights to adjust menu pricing, introduce new items, or phase out less popular dishes.
 
-Enhance Loyalty Program: Focus on popular items like ramen to drive engagement.   
-Personalized Offers: Target frequent visitors like Customer B with special deals.   
-Membership Benefits: Promote the benefits of membership using data on points accumulation.   
-These findings will help Danny improve customer experience and loyalty programs.   
+Implementing these recommendations could help Danny's Diner attract more customers, increase sales, and build a loyal customer base.
+  
 *** 
 
 Click [here](https://github.com/MissSamyuktha/Danny-s-Diner-Case-Study/tree/main/Diner_Project_sql_code) to check out project files!
