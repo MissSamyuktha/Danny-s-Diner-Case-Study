@@ -52,16 +52,16 @@ WITH ranked_visits AS (
 SELECT
     customer_id,
     day_name,
-    day_count
+  --  day_count
 FROM
     ranked_visits
 WHERE
     row_num = 1;
 
 /* Expected results: Most visited day of the week by each customer
-| Customer ID | Day Name | Day Count |
-|------------|---------|----------| 
-| A          | MONDAY  | 2        |
-| B          | FRIDAY  | 3        |
-| C          | MONDAY  | 1        |
+| Customer ID | Day Name |
+|------------|---------|
+| A          | MONDAY  |
+| B          | MONDAY  |
+| C          | FRIDAY  |
 */
